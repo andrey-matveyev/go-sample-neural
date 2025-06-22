@@ -2,9 +2,9 @@ package neural
 
 import "math"
 
-// --- Утилиты для матричных операций (оставляем без изменений) ---
+// --- Utilities for matrix operations (leave unchanged) ---
 
-// AddVectors складывает два вектора поэлементно.
+// AddVectors adds two vectors element-wise.
 func AddVectors(a, b []float64) []float64 {
 	result := make([]float64, len(a))
 	for i := range a {
@@ -13,7 +13,7 @@ func AddVectors(a, b []float64) []float64 {
 	return result
 }
 
-// SubtractVectors вычитает один вектор из другого поэлементно.
+// SubtractVectors subtracts one vector from another element-wise.
 func SubtractVectors(a, b []float64) []float64 {
 	result := make([]float64, len(a))
 	for i := range a {
@@ -22,7 +22,7 @@ func SubtractVectors(a, b []float64) []float64 {
 	return result
 }
 
-// MultiplyVectors поэлементно умножает два вектора.
+// MultiplyVectors multiplies two vectors element-wise.
 func MultiplyVectors(a, b []float64) []float64 {
 	result := make([]float64, len(a))
 	for i := range a {
@@ -31,7 +31,7 @@ func MultiplyVectors(a, b []float64) []float64 {
 	return result
 }
 
-// MultiplyScalarVector умножает вектор на скаляр.
+// MultiplyScalarVector multiplies a vector by a scalar.
 func MultiplyScalarVector(scalar float64, vector []float64) []float64 {
 	result := make([]float64, len(vector))
 	for i := range vector {
@@ -40,7 +40,7 @@ func MultiplyScalarVector(scalar float64, vector []float64) []float64 {
 	return result
 }
 
-// DotProduct выполняет скалярное произведение двух векторов.
+// DotProduct performs the scalar product of two vectors.
 func DotProduct(a, b []float64) float64 {
 	sum := 0.0
 	for i := range a {
@@ -49,7 +49,7 @@ func DotProduct(a, b []float64) float64 {
 	return sum
 }
 
-// OuterProduct вычисляет внешнее произведение двух векторов.
+// OuterProduct calculates the outer product of two vectors.
 func OuterProduct(a, b []float64) [][]float64 {
 	rows := len(a)
 	cols := len(b)
@@ -63,7 +63,7 @@ func OuterProduct(a, b []float64) [][]float64 {
 	return result
 }
 
-// MultiplyMatrixVector умножает матрицу на вектор.
+// MultiplyMatrixVector multiplies a matrix by a vector.
 func MultiplyMatrixVector(matrix [][]float64, vector []float64) []float64 {
 	result := make([]float64, len(matrix))
 	for i := 0; i < len(matrix); i++ {
@@ -72,7 +72,7 @@ func MultiplyMatrixVector(matrix [][]float64, vector []float64) []float64 {
 	return result
 }
 
-// TransposeMatrix транспонирует матрицу.
+// TransposeMatrix transposes the matrix.
 func TransposeMatrix(matrix [][]float64) [][]float64 {
 	rows := len(matrix)
 	if rows == 0 {
@@ -91,25 +91,25 @@ func TransposeMatrix(matrix [][]float64) [][]float64 {
 	return transposed
 }
 
-// --- Функции активации (оставляем без изменений) ---
+// --- Activation functions (leave unchanged) ---
 
-// Sigmoid функция активации.
+// Sigmoid activation function.
 func Sigmoid(x float64) float64 {
 	return 1.0 / (1.0 + math.Exp(-x))
 }
 
-// SigmoidDerivative производная функции Sigmoid.
+// SigmoidDerivative derivative of a function Sigmoid.
 func SigmoidDerivative(x float64) float64 {
 	s := Sigmoid(x)
 	return s * (1 - s)
 }
 
-// ReLU функция активации.
+// ReLU activation function.
 func ReLU(x float64) float64 {
 	return math.Max(0, x)
 }
 
-// ReLUDerivative производная функции ReLU.
+// ReLUDerivative derivative of a function ReLU.
 func ReLUDerivative(x float64) float64 {
 	if x > 0 {
 		return 1.0

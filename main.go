@@ -39,7 +39,7 @@ func main() {
 	learningRate := 0.01
 	epochs := 20000 // Number of training epochs
 
-	for i := 0; i < epochs; i++ {
+	for i := range epochs {
 		totalLoss := 0.0
 		for j := range xorInputs {
 			input := xorInputs[j]

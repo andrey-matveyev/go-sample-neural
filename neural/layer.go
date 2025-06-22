@@ -5,9 +5,9 @@ import (
 	"math/rand"
 )
 
-// --- Объединенная структура слоя нейронной сети ---
+// --- Combined structure of neural network layer ---
 
-// NeuralNetworkLayer представляет один полносвязный слой с функцией активации.
+// NeuralNetworkLayer represents one fully connected layer with an activation function.
 type NeuralNetworkLayer struct {
 	InputSize  int
 	OutputSize int
@@ -17,26 +17,26 @@ type NeuralNetworkLayer struct {
 	ActivationFunc func(float64) float64
 	DerivativeFunc func(float64) float64
 
-	// Временные значения для обратного распространения
-	InputVector  []float64 // Входные значения в слой (от предыдущего слоя)
-	WeightedSums []float64 // Значения после линейной трансформации (до активации)
-	OutputVector []float64 // Выходные значения после активации
+	// Temporal values ​​for backpropagation
+	InputVector  []float64 // Input values ​​to layer (from previous layer)
+	WeightedSums []float64 // Values ​​after linear transformation (before activation)
+	OutputVector []float64 // Output values ​​after activation
 
-	// Градиенты для обновления весов и смещений
+	// Gradients for updating weights and biases
 	WeightGradients [][]float64
 	BiasGradients   []float64
-	InputGradient   []float64 // Градиент, передаваемый на предыдущий слой
+	InputGradient   []float64 // Gradient passed to the previous layer
 }
 
-// NewNeuralNetworkLayer создает новый полносвязный слой с функцией активации.
-// activationName может быть "relu", "sigmoid" или "none" для линейного слоя.
+// NewNeuralNetworkLayer creates a new fully connected layer with activation function.
+// activationName can be "relu", "sigmoid" or "none" for a linear layer.
 func NewNeuralNetworkLayer(inputSize, outputSize int, activationName string) *NeuralNetworkLayer {
 	weights := make([][]float64, outputSize)
 	biases := make([]float64, outputSize)
 	for i := range weights {
 		weights[i] = make([]float64, inputSize)
 		for j := range weights[i] {
-			// Инициализация весов случайными величинами
+			// Initialize weights with random values
 			weights[i][j] = rand.NormFloat64() * math.Sqrt(2.0/float64(inputSize))
 		}
 		biases[i] = 0.0
@@ -56,7 +56,7 @@ func NewNeuralNetworkLayer(inputSize, outputSize int, activationName string) *Ne
 	case "relu":
 		layer.ActivationFunc = ReLU
 		layer.DerivativeFunc = ReLUDerivative
-	case "none": // Для выходного слоя без активации
+	case "none": // For output layer without activation
 		layer.ActivationFunc = func(x float64) float64 { return x }
 		layer.DerivativeFunc = func(x float64) float64 { return 1.0 }
 	default:
@@ -66,14 +66,14 @@ func NewNeuralNetworkLayer(inputSize, outputSize int, activationName string) *Ne
 	return layer
 }
 
-// Forward выполняет прямой проход через слой (линейная часть + активация).
+// Forward performs a forward pass through the layer (linear part + activation).
 func (item *NeuralNetworkLayer) Forward(input []float64) []float64 {
 	item.InputVector = input
-	// 1. Линейная трансформация
+	// 1. Linear transformation
 	item.WeightedSums = MultiplyMatrixVector(item.Weights, input)
 	item.WeightedSums = AddVectors(item.WeightedSums, item.Biases)
 
-	// 2. Активация
+	// 2. Activation
 	item.OutputVector = make([]float64, len(item.WeightedSums))
 	for i := range item.WeightedSums {
 		item.OutputVector[i] = item.ActivationFunc(item.WeightedSums[i])
@@ -81,30 +81,30 @@ func (item *NeuralNetworkLayer) Forward(input []float64) []float64 {
 	return item.OutputVector
 }
 
-// Backward выполняет обратный проход через слой.
+// Backward performs a reverse pass through the layer.
 func (item *NeuralNetworkLayer) Backward(outputGradient []float64) []float64 {
-	// 1. Градиент через функцию активации (применяем производную активации к WeightedSums)
+	// 1. Gradient via activation function (apply the derivative of the activation to WeightedSums)
 	activationGradient := make([]float64, len(item.WeightedSums))
 	for i := range item.WeightedSums {
 		activationGradient[i] = item.DerivativeFunc(item.WeightedSums[i])
 	}
-	// Совмещаем градиент от следующего слоя с градиентом активации
+	// Combine the gradient from the next layer with the activation gradient
 	gradientAfterActivation := MultiplyVectors(outputGradient, activationGradient)
 
-	// 2. Градиент по смещениям равен градиенту после активации
+	// 2. The gradient at offsets is equal to the gradient after activation
 	item.BiasGradients = gradientAfterActivation
 
-	// 3. Градиент по весам = внешнее произведение (Input X gradientAfterActivation)
+	// 3. Gradient by weights = outer product (Input X gradientAfterActivation)
 	item.WeightGradients = OuterProduct(gradientAfterActivation, item.InputVector)
 
-	// 4. Градиент по входу = ТранспонированныеВеса * gradientAfterActivation
+	// 4. Gradient after input = TransposedWeights * gradientAfterActivation
 	transposedWeights := TransposeMatrix(item.Weights)
 	item.InputGradient = MultiplyMatrixVector(transposedWeights, gradientAfterActivation)
 
 	return item.InputGradient
 }
 
-// Update обновляет веса и смещения слоя.
+// Update - Updates the layer's weights and biases.
 func (item *NeuralNetworkLayer) Update(learningRate float64) {
 	// Обновление весов
 	for i := range item.Weights {
@@ -112,7 +112,7 @@ func (item *NeuralNetworkLayer) Update(learningRate float64) {
 			item.Weights[i][j] -= learningRate * item.WeightGradients[i][j]
 		}
 	}
-	// Обновление смещений
+	// Updating biases
 	for i := range item.Biases {
 		item.Biases[i] -= learningRate * item.BiasGradients[i]
 	}
