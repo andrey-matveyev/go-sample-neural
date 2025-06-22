@@ -36,8 +36,12 @@ func NewNeuralNetworkLayer(inputSize, outputSize int, activationName string) *Ne
 	for i := range weights {
 		weights[i] = make([]float64, inputSize)
 		for j := range weights[i] {
-			// Initialize weights with random values
-			weights[i][j] = rand.NormFloat64() * math.Sqrt(2.0/float64(inputSize))
+			// Initialize weights based on the activation function
+			if activationName == "relu" {
+				weights[i][j] = rand.NormFloat64() * math.Sqrt(2.0/float64(inputSize)) // He initialization
+			} else {
+				weights[i][j] = rand.NormFloat64() * math.Sqrt(1.0/float64(inputSize)) // More general approach
+			}
 		}
 		biases[i] = 0.0
 	}
